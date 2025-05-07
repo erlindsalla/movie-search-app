@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
+import { useDebouncedCallback } from "use-debounce";
 
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
@@ -29,13 +30,23 @@ const SearchBar = ({
     }
   };
 
+  const debounced = useDebouncedCallback((value) => {
+    if (value.trim().length > 1) {
+      onSearch(value);
+    }
+  }, 1000);
+
   return (
     <div className="mb-8">
       <div className="flex shadow-md rounded-lg overflow-hidden">
         <input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            //changes requested on tech review
+            debounced(e.target.value);
+          }}
           onKeyDown={handleKeyPress}
           placeholder={placeholder}
           className="flex-grow p-4 focus:outline-none"
